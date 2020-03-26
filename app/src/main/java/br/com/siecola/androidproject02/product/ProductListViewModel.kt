@@ -1,7 +1,10 @@
 package br.com.siecola.androidproject02.product
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import br.com.siecola.androidproject02.network.Product
 import br.com.siecola.androidproject02.network.SalesApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +18,10 @@ class ProductListViewModel : ViewModel() {
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
+    private val _products = MutableLiveData<List<Product>>()
+    val products: LiveData<List<Product>>
+        get() = _products
+
     init {
         getProducts()
     }
@@ -26,9 +33,11 @@ class ProductListViewModel : ViewModel() {
             try {
                 Log.i(TAG, "Loading products")
 
-                var listResult = getProductsDeferred.await()
+                var productsList = getProductsDeferred.await()
 
-                Log.i(TAG, "Number of products ${listResult.size}")
+                Log.i(TAG, "Number of products ${productsList.size}")
+
+                _products.value = productsList
             } catch (e: Exception) {
                 Log.i(TAG, "Error: ${e.message}")
             }
@@ -36,6 +45,10 @@ class ProductListViewModel : ViewModel() {
         Log.i(TAG, "Products list requested")
     }
 
+    fun refreshProducts() {
+        _products.value = null
+        getProducts()
+    }
 
     override fun onCleared() {
         super.onCleared()
