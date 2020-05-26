@@ -12,7 +12,7 @@ class OauthTokenInterceptor() : Interceptor {
         var request = chain.request()
         val accessToken = SharedPreferencesUtils.getAccessToken()
 
-        accessToken.let {
+        if (accessToken != null) {
             Log.i(TAG, "Using the existing token")
             request = request.newBuilder()
                 .addHeader("Authorization", "Bearer ${accessToken}")

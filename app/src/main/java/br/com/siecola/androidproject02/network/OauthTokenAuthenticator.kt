@@ -11,14 +11,11 @@ private const val TAG = "OauthTokenAuthenticator"
 
 class OauthTokenAuthenticator() : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        var accessToken: String?
+        val accessToken: String?
 
-        accessToken = SharedPreferencesUtils.getAccessToken()
-        if (accessToken == null) {
-            val token = retrieveNewToken()
-            accessToken = token.accessToken
-            SharedPreferencesUtils.saveToken(token.accessToken, token.expiresIn)
-        }
+        val token = retrieveNewToken()
+        accessToken = token.accessToken
+        SharedPreferencesUtils.saveToken(token.accessToken, token.expiresIn)
 
         return response.request().newBuilder()
             .header("Authorization", "Bearer ${accessToken}")
